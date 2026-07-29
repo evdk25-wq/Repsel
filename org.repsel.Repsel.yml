@@ -1,0 +1,34 @@
+app-id: org.repsel.Repsel
+runtime: org.gnome.Platform
+runtime-version: '45'
+sdk: org.gnome.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+  - org.freedesktop.Sdk.Extension.node18
+command: repsel
+finish-args:
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --device=dri
+  - --share=network
+  - --filesystem=host
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin:/usr/lib/sdk/node18/bin
+  build-args:
+    - --share=network
+  env:
+    CARGO_HOME: /run/build/repsel/cargo
+    NPM_CONFIG_CACHE: /run/build/repsel/npm
+modules:
+  - name: repsel
+    buildsystem: simple
+    build-commands:
+      - npm install
+      - npm run tauri build
+      - install -Dm755 src-tauri/target/release/repsel /app/bin/repsel
+      - install -Dm644 src-tauri/icons/32x32.png /app/share/icons/hicolor/32x32/apps/org.repsel.Repsel.png
+      - install -Dm644 src-tauri/icons/128x128.png /app/share/icons/hicolor/128x128/apps/org.repsel.Repsel.png
+    sources:
+      - type: dir
+        path: .

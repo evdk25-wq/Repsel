@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="src/assets/RepselLogo.png" alt="Logo de Repsel" width="120">
+  <img src="src/assets/BigLogo.png" alt="Logo de Repsel" width="120">
 
   # Repsel
 

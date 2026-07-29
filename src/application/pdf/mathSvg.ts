@@ -23,11 +23,14 @@ const extractSvg = (markup: string): string => {
 };
 
 const inlineDimensions = (svg: string): string => {
-  const viewBox = svg.match(/viewBox="[^"]*?([\d.]+)\s+([\d.]+)"/u);
+  const viewBox = svg.match(/viewBox="([^"]+)"/u);
   if (!viewBox) return "";
 
-  const width = Number(viewBox[1]);
-  const height = Number(viewBox[2]);
+  const values = viewBox[1].trim().split(/\s+/u).map(Number);
+  if (values.length !== 4) return "";
+
+  const width = values[2];
+  const height = values[3];
   if (!Number.isFinite(width) || !Number.isFinite(height) || height <= 0) return "";
 
   const heightEm = 1.35;

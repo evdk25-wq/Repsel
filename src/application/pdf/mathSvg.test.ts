@@ -12,10 +12,12 @@ describe("renderMathSvg", () => {
 
   it("preserves the full aspect ratio of inline formulas", () => {
     const result = renderMathSvg(String.raw`E=mc^2`, false);
+    const width = Number(result.match(/style="width:([\d.]+)em/u)?.[1]);
 
     expect(result).toMatch(
       /class="repsel-math-inline" style="width:\d+\.\d{3}em;height:1\.35em"/u,
     );
+    expect(width).toBeGreaterThan(3);
   });
 
   it("renders matrices without relying on positioned HTML glyphs", () => {

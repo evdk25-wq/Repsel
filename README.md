@@ -1,5 +1,4 @@
-<div align="center">
-  <img src="src/assets/BigLogo.png" alt="Logo de Repsel" width="120">
+<p><img src="BigLogo.png" alt="Aperçu de l'application" style="max-width:100%;height:auto"></p>
 
   # Repsel
 

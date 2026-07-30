@@ -16,3 +16,16 @@ export const countDocument = (content: string): DocumentStats => ({
 
 export const filenameFromPath = (path: string | null): string =>
   path?.split(/[\\/]/u).pop() || "Sans titre";
+
+export const ensureFileExtension = (path: string, extension: string): string => {
+  const normalizedExtension = extension.replace(/^\./u, "");
+  return path.toLocaleLowerCase().endsWith(`.${normalizedExtension.toLocaleLowerCase()}`)
+    ? path
+    : `${path}.${normalizedExtension}`;
+};
+
+export const replaceFileExtension = (filename: string, extension: string): string => {
+  const normalizedExtension = extension.replace(/^\./u, "");
+  const stem = filename.replace(/\.[^./\\]+$/u, "");
+  return `${stem}.${normalizedExtension}`;
+};

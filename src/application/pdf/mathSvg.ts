@@ -33,13 +33,13 @@ const inlineDimensions = (svg: string): string => {
   const height = values[3];
   if (!Number.isFinite(width) || !Number.isFinite(height) || height <= 0) return "";
 
-  const heightEm = 1.35;
+  const heightEm = 1.05;
   const widthEm = Math.max(0.5, (width / height) * heightEm);
-  return ` style="width:${widthEm.toFixed(3)}em;height:${heightEm}em"`;
+  return ` style="width:${widthEm.toFixed(3)}em;height:${heightEm.toFixed(2)}em"`;
 };
 
 export const renderMathSvg = (expression: string, displayMode: boolean): string => {
-  const node = documentNode.convert(expression.trim(), { display: displayMode });
+  const node = documentNode.convert(expression.trim(), { display: true });
   const svg = extractSvg(adaptor.outerHTML(node));
   const className = displayMode ? "repsel-math-display" : "repsel-math-inline";
   const dimensions = displayMode ? "" : inlineDimensions(svg);

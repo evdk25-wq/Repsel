@@ -106,8 +106,8 @@ export const createPdf = async (content: string, title: string): Promise<Uint8Ar
         },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
         pagebreak: {
-          mode: ["css", "legacy"],
-          avoid: ["pre", "blockquote", "table", ".repsel-math-display"],
+          mode: ["avoid-all", "css", "legacy"],
+          avoid: ["p", "li", "pre", "blockquote", "table", "tr", ".repsel-math-display"],
         },
       })
       .from(element)

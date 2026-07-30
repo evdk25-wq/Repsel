@@ -12,12 +12,12 @@ vi.mock("@tauri-apps/api/window", () => ({
 
 describe("HeaderBar Component", () => {
   it("renders the default title when none is provided", () => {
-    render(<HeaderBar onOpen={() => {}} onSave={() => {}} onSaveAs={() => {}} onExport={() => {}} onClear={() => {}} />);
+    render(<HeaderBar onOpen={() => {}} onSave={() => {}} onSaveAs={() => {}} onExport={() => {}} onClear={() => {}} onClose={() => {}} />);
     expect(screen.getByText("Repsel")).toBeInTheDocument();
   });
 
   it("renders the provided document title", () => {
-    render(<HeaderBar title="My Document.md" onOpen={() => {}} onSave={() => {}} onSaveAs={() => {}} onExport={() => {}} onClear={() => {}} />);
+    render(<HeaderBar title="My Document.md" onOpen={() => {}} onSave={() => {}} onSaveAs={() => {}} onExport={() => {}} onClear={() => {}} onClose={() => {}} />);
     expect(screen.getByText("My Document.md")).toBeInTheDocument();
   });
 
@@ -27,15 +27,16 @@ describe("HeaderBar Component", () => {
     const handleExport = vi.fn();
     const handleClear = vi.fn();
     const handleSaveAs = vi.fn();
+    const handleClose = vi.fn();
 
-    render(<HeaderBar onOpen={handleOpen} onSave={handleSave} onSaveAs={handleSaveAs} onExport={handleExport} onClear={handleClear} />);
+    render(<HeaderBar onOpen={handleOpen} onSave={handleSave} onSaveAs={handleSaveAs} onExport={handleExport} onClear={handleClear} onClose={handleClose} />);
 
     fireEvent.click(screen.getByText("Fichier"));
     fireEvent.click(screen.getByText("Ouvrir…"));
     expect(handleOpen).toHaveBeenCalledTimes(1);
 
     fireEvent.click(screen.getByText("Fichier"));
-    fireEvent.click(screen.getByText("Sauvegarder"));
+    fireEvent.click(screen.getByText("Enregistrer"));
     expect(handleSave).toHaveBeenCalledTimes(1);
 
     fireEvent.click(screen.getByText("Fichier"));
@@ -49,5 +50,8 @@ describe("HeaderBar Component", () => {
     fireEvent.click(screen.getByText("Édition"));
     fireEvent.click(screen.getByText("Nouveau"));
     expect(handleClear).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByTitle("Fermer"));
+    expect(handleClose).toHaveBeenCalledTimes(1);
   });
 });

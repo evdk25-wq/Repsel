@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { createPdf } from "../application/pdf/exportPdf";
-import { countDocument, filenameFromPath } from "../domain/document";
+import { countDocument, filenameFromPath, replaceFileExtension } from "../domain/document";
 import {
   loadDocument,
   persistBinary,
@@ -13,18 +13,20 @@ import {
 import HeaderBar from "./components/HeaderBar";
 import Editor from "./components/Editor";
 import StatusBar from "./components/StatusBar";
+import { useI18n } from "./i18n";
 
 const App: React.FC = () => {
+  const { locale, t } = useI18n();
   const initialText = "";
   const [content, setContent] = useState<string>(initialText);
   const initialStats = countDocument(initialText);
   const [wordCount, setWordCount] = useState<number>(initialStats.words);
   const [charCount, setCharCount] = useState<number>(initialStats.characters);
   const [currentFilePath, setCurrentFilePath] = useState<string | null>(null);
-  const [debugError, setDebugError] = useState<string | null>(null);
+  const [editorSession, setEditorSession] = useState(0);
   const [isDirty, setIsDirty] = useState(false);
+  const [isCloseDialogOpen, setIsCloseDialogOpen] = useState(false);
   const [notice, setNotice] = useState<{ message: string; kind: "success" | "error" } | null>(null);
-  const allowCloseRef = useRef(false);
 
   const notify = (message: string, kind: "success" | "error" = "success") => {
     setNotice({ message, kind });
@@ -35,17 +37,6 @@ const App: React.FC = () => {
     const timer = window.setTimeout(() => setNotice(null), 3500);
     return () => window.clearTimeout(timer);
   }, [notice]);
-
-  useEffect(() => {
-    const handleErr = (msg: any, _url: any, lineNo: any, _columnNo: any, error: any) => {
-      setDebugError(`${msg} \nLine: ${lineNo} \nError: ${error?.stack || error}`);
-      return false;
-    };
-    window.onerror = handleErr;
-    window.addEventListener("unhandledrejection", (e) => {
-      setDebugError(`Promise Rejection: ${e.reason?.stack || e.reason}`);
-    });
-  }, []);
 
   const handleContentChange = (newContent: string) => {
     setContent(newContent);
@@ -59,23 +50,24 @@ const App: React.FC = () => {
     try {
       let path = saveAs ? null : currentFilePath;
       if (!path) {
-        path = await selectMarkdownDestination();
+        path = await selectMarkdownDestination(
+          currentFilePath ? filenameFromPath(currentFilePath) : `${t("untitled")}.md`,
+        );
         if (!path) return false;
         setCurrentFilePath(path);
       }
       await persistDocument(path, content);
       setIsDirty(false);
-      notify("Document enregistré");
+      notify(`${t("saved")} : ${filenameFromPath(path)}`);
       return true;
     } catch (e) {
-      console.error("Save failed", e);
-      notify(`Impossible d’enregistrer le document : ${String(e)}`, "error");
+      notify(`${t("saveError")} : ${String(e)}`, "error");
       return false;
     }
   };
 
   const handleOpen = async () => {
-    if (isDirty && !window.confirm("Les modifications non enregistrées seront perdues. Ouvrir un autre document ?")) {
+    if (isDirty && !window.confirm(t("openDiscard"))) {
       return;
     }
     try {
@@ -84,65 +76,80 @@ const App: React.FC = () => {
         const doc = await loadDocument(path);
         setCurrentFilePath(path);
         setContent(doc.content);
+        setEditorSession((session) => session + 1);
         const stats = countDocument(doc.content);
         setCharCount(stats.characters);
         setWordCount(stats.words);
         setIsDirty(false);
-        notify("Document ouvert");
+        notify(t("opened"));
       }
     } catch (e) {
-      console.error("Open failed", e);
-      notify(`Impossible d’ouvrir le document : ${String(e)}`, "error");
+      notify(`${t("openError")} : ${String(e)}`, "error");
     }
   };
 
   const handleClear = () => {
-    if (isDirty && !window.confirm("Créer un nouveau document et perdre les modifications non enregistrées ?")) {
+    if (isDirty && !window.confirm(t("newDiscard"))) {
       return;
     }
     setContent("");
     setWordCount(0);
     setCharCount(0);
     setCurrentFilePath(null);
+    setEditorSession((session) => session + 1);
     setIsDirty(false);
-    notify("Nouveau document créé");
+    notify(t("created"));
   };
 
   const handleExport = async () => {
     try {
-      const path = await selectPdfDestination();
+      const suggestedName = replaceFileExtension(
+        currentFilePath ? filenameFromPath(currentFilePath) : t("untitled"),
+        "pdf",
+      );
+      const path = await selectPdfDestination(suggestedName);
       if (path) {
         const bytes = await createPdf(content, filenameFromPath(currentFilePath));
         await persistBinary(path, bytes);
-        notify("PDF exporté");
+        notify(`${t("exported")} : ${filenameFromPath(path)}`);
       }
     } catch (e) {
-      console.error("Export failed", e);
-      notify(`Impossible d’exporter le PDF : ${String(e)}`, "error");
+      notify(`${t("exportError")} : ${String(e)}`, "error");
+    }
+  };
+
+  const destroyWindow = async () => {
+    await getCurrentWindow().destroy();
+  };
+
+  const requestClose = () => {
+    if (isDirty) {
+      setIsCloseDialogOpen(true);
+      return;
+    }
+    void destroyWindow();
+  };
+
+  const saveAndClose = async () => {
+    if (await handleSave()) {
+      await destroyWindow();
     }
   };
 
   useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (isDirty) event.preventDefault();
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
     let unlisten: (() => void) | undefined;
-    getCurrentWindow().onCloseRequested(async (event) => {
-      if (isDirty && !allowCloseRef.current) {
-        event.preventDefault();
-        if (window.confirm("Quitter Repsel sans enregistrer les modifications ?")) {
-          allowCloseRef.current = true;
-          await getCurrentWindow().close();
-        }
+    getCurrentWindow().onCloseRequested((event) => {
+      event.preventDefault();
+      if (isDirty) {
+        setIsCloseDialogOpen(true);
+      } else {
+        void destroyWindow();
       }
     }).then((fn) => {
       unlisten = fn;
     });
 
     return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
       unlisten?.();
     };
   }, [isDirty]);
@@ -162,13 +169,13 @@ const App: React.FC = () => {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [content, currentFilePath, isDirty]);
+  }, [content, currentFilePath, isDirty, locale]);
 
-  const filename = filenameFromPath(currentFilePath);
+  const filename = currentFilePath ? filenameFromPath(currentFilePath) : t("untitled");
 
   return (
     <div className="app-shell">
-      <HeaderBar onOpen={handleOpen} onSave={() => void handleSave()} onSaveAs={() => void handleSave(true)} onExport={handleExport} onClear={handleClear} title={`${isDirty ? "● " : ""}Repsel — ${filename}`} />
+      <HeaderBar onOpen={handleOpen} onSave={() => void handleSave()} onSaveAs={() => void handleSave(true)} onExport={handleExport} onClear={handleClear} onClose={requestClose} title={`${isDirty ? "● " : ""}Repsel — ${filename}`} />
 
       {notice && (
         <div
@@ -181,17 +188,27 @@ const App: React.FC = () => {
         </div>
       )}
       
-      {debugError && (
-        <div className="absolute top-12 left-0 right-0 z-50 bg-red-500 text-white p-4 overflow-auto max-h-64 whitespace-pre-wrap">
-          <strong>Debug Error:</strong><br/>
-          {debugError}
-        </div>
-      )}
-
       <main className="editor-stage">
-        <Editor initialContent={content} onChange={handleContentChange} />
+        <Editor key={editorSession} initialContent={content} onChange={handleContentChange} />
       </main>
       <StatusBar wordCount={wordCount} charCount={charCount} isDirty={isDirty} />
+
+      {isCloseDialogOpen && (
+        <div className="confirm-overlay" role="presentation">
+          <section className="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="close-dialog-title">
+            <div className="confirm-dialog-copy">
+              <span className="confirm-dialog-label">REPSEL</span>
+              <h2 id="close-dialog-title">{t("closeTitle")}</h2>
+              <p>{t("closeCopy")}</p>
+            </div>
+            <div className="confirm-dialog-actions">
+              <button className="confirm-button" onClick={() => setIsCloseDialogOpen(false)}>{t("cancel")}</button>
+              <button className="confirm-button confirm-button-danger" onClick={() => void destroyWindow()}>{t("discardAndQuit")}</button>
+              <button className="confirm-button confirm-button-primary" onClick={() => void saveAndClose()}>{t("saveAndQuit")}</button>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 };

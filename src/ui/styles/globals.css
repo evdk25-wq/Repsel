@@ -194,6 +194,27 @@
   background: var(--border);
 }
 
+.menu-section-label {
+  padding: 7px 11px 5px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.menu-item.is-selected {
+  background: color-mix(in srgb, var(--accent) 11%, transparent);
+  color: var(--text);
+}
+
+.menu-language-code {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
 .header-actions {
   gap: 4px;
 }
@@ -927,6 +948,86 @@
   background-clip: padding-box;
 }
 
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(8, 9, 12, 0.66);
+  backdrop-filter: blur(8px);
+}
+
+.confirm-dialog {
+  width: min(480px, 100%);
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+}
+
+.confirm-dialog-copy {
+  padding: 28px 30px 24px;
+}
+
+.confirm-dialog-label {
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.confirm-dialog h2 {
+  margin: 8px 0 10px;
+  color: var(--text);
+  font-size: 19px;
+  font-weight: 650;
+}
+
+.confirm-dialog p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.confirm-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-soft);
+}
+
+.confirm-button {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.confirm-button:hover {
+  background: var(--surface-hover);
+}
+
+.confirm-button-danger {
+  color: #dc7373;
+}
+
+.confirm-button-primary {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border-strong));
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent);
+}
+
 .repsel-export-stage {
   position: fixed;
   inset: 0;
@@ -980,6 +1081,17 @@
 .repsel-pdf ul,
 .repsel-pdf ol {
   margin: 0 0 14px;
+}
+
+.repsel-pdf p,
+.repsel-pdf li,
+.repsel-pdf blockquote,
+.repsel-pdf pre,
+.repsel-pdf table,
+.repsel-pdf tr,
+.repsel-pdf .repsel-math-display {
+  break-inside: avoid;
+  page-break-inside: avoid;
 }
 
 .repsel-pdf ul,
@@ -1105,7 +1217,8 @@
 .repsel-pdf .repsel-math-inline {
   display: inline-block;
   flex: none;
-  vertical-align: -0.2em;
+  margin: 0 0.08em;
+  vertical-align: -0.62em;
 }
 
 .repsel-pdf .repsel-math-inline svg {

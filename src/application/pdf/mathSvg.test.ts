@@ -15,9 +15,9 @@ describe("renderMathSvg", () => {
     const width = Number(result.match(/style="width:([\d.]+)em/u)?.[1]);
 
     expect(result).toMatch(
-      /class="repsel-math-inline" style="width:\d+\.\d{3}em;height:1\.35em"/u,
+      /class="repsel-math-inline" style="width:\d+\.\d{3}em;height:1\.05em"/u,
     );
-    expect(width).toBeGreaterThan(3);
+    expect(width).toBeGreaterThan(2.5);
   });
 
   it("renders matrices without relying on positioned HTML glyphs", () => {

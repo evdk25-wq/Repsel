@@ -137,8 +137,7 @@ const buildUnifiedDecorations = (view: EditorView) => {
 
   try {
     return Decoration.set(widgets, true);
-  } catch (e) {
-    console.error("Decoration Error:", e);
+  } catch {
     return Decoration.none;
   }
 };

@@ -14,6 +14,7 @@ jobs:
   release-linux:
     name: Build Linux packages
     runs-on: ubuntu-22.04
+    environment: release
 
     steps:
       - name: Check out repository
@@ -76,9 +77,55 @@ jobs:
           args: --bundles deb,appimage
           releaseAssetNamePattern: Repsel_[version]_[arch][ext]
 
+      - name: Import release signing key
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.REPSEL_GPG_PRIVATE_KEY }}
+        run: |
+          install -d -m 700 "${RUNNER_TEMP}/repsel-gnupg"
+          printf '%s' "${GPG_PRIVATE_KEY}" | gpg \
+            --batch \
+            --homedir "${RUNNER_TEMP}/repsel-gnupg" \
+            --import
+
+      - name: Create checksums and signatures
+        env:
+          GPG_PASSPHRASE: ${{ secrets.REPSEL_GPG_PASSPHRASE }}
+        working-directory: src-tauri/target/release/bundle
+        run: |
+          mapfile -t artifacts < <(find deb appimage -maxdepth 1 -type f \( -name '*.deb' -o -name '*.AppImage' \) -printf '%p\n' | sort)
+          test "${#artifacts[@]}" -eq 2
+          : > SHA256SUMS
+          for artifact in "${artifacts[@]}"; do
+            checksum="$(sha256sum "${artifact}" | cut -d ' ' -f 1)"
+            printf '%s  %s\n' "${checksum}" "$(basename "${artifact}")" >> SHA256SUMS
+          done
+          for artifact in "${artifacts[@]}" SHA256SUMS; do
+            gpg \
+              --batch \
+              --yes \
+              --pinentry-mode loopback \
+              --passphrase "${GPG_PASSPHRASE}" \
+              --homedir "${RUNNER_TEMP}/repsel-gnupg" \
+              --armor \
+              --detach-sign "${artifact}"
+          done
+
+      - name: Upload checksums and signatures
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: src-tauri/target/release/bundle
+        run: |
+          gh release upload "${GITHUB_REF_NAME}" \
+            SHA256SUMS \
+            SHA256SUMS.asc \
+            deb/*.deb.asc \
+            appimage/*.AppImage.asc \
+            --clobber
+
       - name: Attest release artifacts
         uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a
         with:
           subject-path: |
             src-tauri/target/release/bundle/deb/*.deb
             src-tauri/target/release/bundle/appimage/*.AppImage
+            src-tauri/target/release/bundle/SHA256SUMS

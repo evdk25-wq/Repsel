@@ -34,30 +34,6 @@ chmod +x Repsel_1.0.0_amd64.AppImage
 ./Repsel_1.0.0_amd64.AppImage
 ```
 
-### Vérifier le téléchargement
-
-La release fournit les sommes SHA-256 et des signatures OpenPGP pour les deux
-formats. Après avoir téléchargé les fichiers nécessaires :
-
-```bash
-sha256sum --ignore-missing --check SHA256SUMS
-gpg --import repsel-release-key.asc
-gpg --verify SHA256SUMS.asc SHA256SUMS
-```
-
-La [clé publique de Repsel](https://github.com/evdk25-wq/Repsel/releases/download/v1.0.0/repsel-release-key.asc)
-possède l’empreinte principale suivante :
-
-```text
-4BC9 0A4C 58B1 B5EC FD82 AE29 E90C 39C8 07DB C31F
-```
-
-Les fichiers sont signés par la sous-clé :
-
-```text
-7FAD 8CEE 299D 8BD9 391A 668B 35C6 9B51 FBC4 9696
-```
-
 ## À propos
 
 Repsel est un éditeur Markdown pensé pour écrire sans détourner l’attention du

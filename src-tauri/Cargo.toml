@@ -1,6 +1,6 @@
 [package]
 name = "repsel"
-version = "1.0.0"
+version = "1.0.1"
 description = "A focused Markdown editor for Linux"
 authors = ["Repsel contributors"]
 edition = "2021"

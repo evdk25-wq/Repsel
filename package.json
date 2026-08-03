@@ -1,7 +1,7 @@
 {
   "name": "repsel",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A focused Markdown editor for Linux",
   "license": "MIT",
   "type": "module",

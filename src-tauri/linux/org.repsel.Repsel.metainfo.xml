@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.repsel.Repsel</id>
+  <name>Repsel</name>
+  <summary>A focused Markdown editor for Linux</summary>
+  <summary xml:lang="fr">Un éditeur Markdown sobre conçu pour Linux</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <developer id="org.repsel">
+    <name>Repsel contributors</name>
+  </developer>
+  <description>
+    <p>
+      Repsel is a local-first Markdown editor with live formatting,
+      mathematical notation and polished PDF export.
+    </p>
+    <p xml:lang="fr">
+      Repsel est un éditeur Markdown local avec mise en forme intégrée,
+      notation mathématique et export PDF soigné.
+    </p>
+  </description>
+  <launchable type="desktop-id">Repsel.desktop</launchable>
+  <icon type="stock">repsel</icon>
+  <url type="homepage">https://github.com/evdk25-wq/Repsel</url>
+  <url type="bugtracker">https://github.com/evdk25-wq/Repsel/issues</url>
+  <provides>
+    <binary>repsel</binary>
+  </provides>
+  <categories>
+    <category>Office</category>
+    <category>TextEditor</category>
+  </categories>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/evdk25-wq/Repsel/main/1.png</image>
+      <caption>Write Markdown in a focused desktop environment</caption>
+      <caption xml:lang="fr">Écrire en Markdown dans un environnement sobre</caption>
+    </screenshot>
+  </screenshots>
+  <releases>
+    <release version="1.0.1" date="2026-08-03">
+      <description>
+        <p>Add AppStream metadata and high-resolution store artwork.</p>
+      </description>
+    </release>
+    <release version="1.0.0" date="2026-08-03"/>
+  </releases>
+  <content_rating type="oars-1.1"/>
+</component>

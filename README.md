@@ -9,14 +9,14 @@
   locale fondée sur Tauri et WebKitGTK.
 </div>
 
-## Télécharger Repsel 1.0.0
+## Télécharger Repsel 1.0.1
 
 Repsel est disponible pour Linux sur les machines 64 bits.
 
 | Format | Usage | Téléchargement |
 | --- | --- | --- |
-| Debian `.deb` | Debian, Ubuntu et distributions dérivées | [Repsel 1.0.0 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.0.0/Repsel_1.0.0_amd64.deb) |
-| AppImage | Exécution portable sans installation | [Repsel 1.0.0 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.0.0/Repsel_1.0.0_amd64.AppImage) |
+| Debian `.deb` | Debian, Ubuntu et distributions dérivées | [Repsel 1.0.1 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.0.1/Repsel_1.0.1_amd64.deb) |
+| AppImage | Exécution portable sans installation | [Repsel 1.0.1 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.0.1/Repsel_1.0.1_amd64.AppImage) |
 
 Toutes les versions et leurs notes sont disponibles dans les
 [releases GitHub](https://github.com/evdk25-wq/Repsel/releases).
@@ -24,14 +24,14 @@ Toutes les versions et leurs notes sont disponibles dans les
 ### Installer le paquet Debian
 
 ```bash
-sudo apt install ./Repsel_1.0.0_amd64.deb
+sudo apt install ./Repsel_1.0.1_amd64.deb
 ```
 
 ### Lancer l’AppImage
 
 ```bash
-chmod +x Repsel_1.0.0_amd64.AppImage
-./Repsel_1.0.0_amd64.AppImage
+chmod +x Repsel_1.0.1_amd64.AppImage
+./Repsel_1.0.1_amd64.AppImage
 ```
 
 ## À propos

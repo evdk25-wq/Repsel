@@ -1,73 +1,74 @@
 <div align="center">
-  <p><img src="1.png" alt="Aperçu de l'application" style="max-width:100%;height:auto"></p>
+  <p><img src="1.png" alt="Repsel application preview" style="max-width:100%;height:auto"></p>
 
   # Repsel
 
-  **Un éditeur Markdown de bureau, sobre et concentré, conçu pour Linux.**
+  **English** · [Français](docs/README.fr.md)
 
-  Écriture fluide, formules mathématiques et export PDF dans une application
-  locale fondée sur Tauri et WebKitGTK.
+  **A focused desktop Markdown editor built for Linux.**
+
+  Fluid writing, mathematical notation, and polished PDF export in a local
+  application powered by Tauri and WebKitGTK.
 </div>
 
-## Télécharger Repsel 1.0.1
+## Download Repsel 1.0.1
 
-Repsel est disponible pour Linux sur les machines 64 bits.
+Repsel is available for 64-bit Linux systems.
 
-| Format | Usage | Téléchargement |
+| Format | Recommended for | Download |
 | --- | --- | --- |
-| Debian `.deb` | Debian, Ubuntu et distributions dérivées | [Repsel 1.0.1 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.0.1/Repsel_1.0.1_amd64.deb) |
-| AppImage | Exécution portable sans installation | [Repsel 1.0.1 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.0.1/Repsel_1.0.1_amd64.AppImage) |
+| Debian `.deb` | Debian, Ubuntu, and derivatives | [Repsel 1.0.1 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.0.1/Repsel_1.0.1_amd64.deb) |
+| AppImage | Portable use without installation | [Repsel 1.0.1 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.0.1/Repsel_1.0.1_amd64.AppImage) |
 
-Toutes les versions et leurs notes sont disponibles dans les
-[releases GitHub](https://github.com/evdk25-wq/Repsel/releases).
+All versions and release notes are available from
+[GitHub Releases](https://github.com/evdk25-wq/Repsel/releases).
 
-### Installer le paquet Debian
+### Install the Debian package
 
 ```bash
 sudo apt install ./Repsel_1.0.1_amd64.deb
 ```
 
-### Lancer l’AppImage
+### Run the AppImage
 
 ```bash
 chmod +x Repsel_1.0.1_amd64.AppImage
 ./Repsel_1.0.1_amd64.AppImage
 ```
 
-## À propos
+## About
 
-Repsel est un éditeur Markdown pensé pour écrire sans détourner l’attention du
-document. Son interface s’intègre naturellement à un environnement Linux et
-combine la simplicité d’un fichier texte avec un rendu visuel immédiat.
+Repsel is a Markdown editor designed to keep attention on the document. Its
+interface fits naturally into a Linux desktop and combines the simplicity of a
+plain-text file with immediate visual feedback.
 
-Les documents restent des fichiers Markdown standards. Repsel ne demande aucun
-compte et ne dépend d’aucun service en ligne pour ouvrir, modifier ou
-enregistrer un document.
+Documents remain standard Markdown files. Repsel requires no account and no
+online service to open, edit, or save a document.
 
-## Fonctionnalités
+## Features
 
-- édition Markdown avec CodeMirror 6 ;
-- masquage visuel de la syntaxe hors de la ligne active ;
-- titres, listes, citations, tâches, tableaux, liens et blocs de code ;
-- formules mathématiques en ligne et centrées ;
-- palette d’insertion et commandes rapides ;
-- barre d’outils contextuelle ;
-- ouverture, enregistrement et « Enregistrer sous » ;
-- protection des modifications non enregistrées ;
-- export PDF A4 avec pagination et rendu mathématique adapté à WebKitGTK ;
-- thèmes clair et sombre persistants ;
-- interface disponible en français et en anglais ;
-- compteurs de mots et de caractères ;
-- interface sans décoration native, adaptée au bureau Linux.
+- Markdown editing powered by CodeMirror 6;
+- visual syntax hiding outside the active line;
+- headings, lists, blockquotes, tasks, tables, links, and code blocks;
+- inline and display mathematical notation;
+- insertion palette and quick commands;
+- contextual formatting toolbar;
+- open, save, and Save As commands;
+- protection against unsaved changes;
+- A4 PDF export with pagination and WebKitGTK-compatible mathematical rendering;
+- persistent light and dark themes;
+- interface available in English and French;
+- word and character counters;
+- custom window chrome designed for the Linux desktop.
 
-## Syntaxe mathématique
+## Mathematical notation
 
-Repsel utilise la syntaxe TeX habituelle :
+Repsel uses standard TeX syntax:
 
 ```markdown
-Une formule en ligne : $E = mc^2$
+An inline formula: $E = mc^2$
 
-Une formule centrée :
+A centered formula:
 
 $$
 f(x) = \frac{1}{\sigma\sqrt{2\pi}}
@@ -75,41 +76,40 @@ f(x) = \frac{1}{\sigma\sqrt{2\pi}}
 $$
 ```
 
-KaTeX assure l’affichage dans l’éditeur. Pour l’export PDF, MathJax 4 produit
-des SVG intermédiaires afin d’éviter les déformations de fractions, de racines
-et de matrices rencontrées avec la capture HTML classique sous WebKitGTK.
+KaTeX renders formulas inside the editor. For PDF export, MathJax 4 produces
+intermediate SVG output to preserve fractions, roots, and matrices under
+WebKitGTK.
 
-## Raccourcis
+## Keyboard shortcuts
 
-| Action | Raccourci |
+| Action | Shortcut |
 | --- | --- |
-| Nouveau document | `Ctrl+N` |
-| Ouvrir | `Ctrl+O` |
-| Enregistrer | `Ctrl+S` |
-| Enregistrer sous | `Ctrl+Maj+S` |
-| Gras | `Ctrl+B` |
-| Italique | `Ctrl+I` |
-| Insérer un lien | `Ctrl+K` |
-| Palette d’insertion | `Ctrl+P` |
-| Aide Markdown | `Ctrl+/` |
+| New document | `Ctrl+N` |
+| Open | `Ctrl+O` |
+| Save | `Ctrl+S` |
+| Save As | `Ctrl+Shift+S` |
+| Bold | `Ctrl+B` |
+| Italic | `Ctrl+I` |
+| Insert link | `Ctrl+K` |
+| Insertion palette | `Ctrl+P` |
+| Markdown help | `Ctrl+/` |
 
-## Pourquoi Tauri et WebKitGTK ?
+## Why Tauri and WebKitGTK?
 
-Repsel utilise Tauri 2 plutôt qu’un navigateur Chromium embarqué. Sous Linux,
-l’interface repose sur WebKitGTK, ce qui permet de conserver une application
-plus compacte, une consommation de ressources maîtrisée et une meilleure
-intégration au système.
+Repsel uses Tauri 2 instead of embedding a Chromium browser. On Linux, its
+interface runs on WebKitGTK, keeping the application compact, resource usage
+under control, and system integration consistent with the desktop.
 
-## Installation pour le développement
+## Development setup
 
-### Prérequis
+### Requirements
 
-- Node.js 20 ou supérieur ;
-- npm ;
-- Rust stable ;
-- les dépendances système requises par Tauri 2.
+- Node.js 20 or later;
+- npm;
+- stable Rust;
+- the system dependencies required by Tauri 2.
 
-Sur Debian ou Ubuntu :
+On Debian or Ubuntu:
 
 ```bash
 sudo apt update
@@ -125,35 +125,35 @@ sudo apt install \
   patchelf
 ```
 
-Installez ensuite Rust si nécessaire :
+Install Rust if needed:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-### Lancer Repsel
+### Run Repsel
 
 ```bash
-cd chemin/vers/Repsel
+cd path/to/Repsel
 npm install
 npm run tauri dev
 ```
 
-Le serveur Vite utilise le port `1420` pendant le développement.
+The Vite development server uses port `1420`.
 
-## Construire l’application
+## Build the application
 
 ```bash
 npm run tauri build
 ```
 
-Les paquets générés sont placés dans :
+Generated packages are written to:
 
 ```text
 src-tauri/target/release/bundle/
 ```
 
-## Vérifications
+## Quality checks
 
 ```bash
 npm test
@@ -162,59 +162,59 @@ cd src-tauri
 cargo test
 ```
 
-La suite couvre notamment le domaine documentaire, l’analyse Markdown,
-l’interface principale et le rendu SVG des formules mathématiques.
+The test suite covers the document domain, Markdown analysis, the main user
+interface, and SVG rendering for mathematical notation.
 
 ## Architecture
 
-Le code sépare les règles métier, les cas d’usage, les accès au système et
-l’interface :
+The codebase separates domain rules, application use cases, system access, and
+the user interface:
 
 ```text
 src/
-├── domain/                 Modèle documentaire et analyse Markdown
+├── domain/                 Document model and Markdown analysis
 ├── application/
-│   └── pdf/                Génération et rendu mathématique du PDF
+│   └── pdf/                PDF generation and mathematical rendering
 ├── infrastructure/
-│   └── tauri/              Dialogues et accès aux fichiers
+│   └── tauri/              Dialogs and file-system access
 └── ui/
-    ├── components/         Composants React
-    ├── editor/             Extension CodeMirror
-    └── styles/             Thèmes et mise en page
+    ├── components/         React components
+    ├── editor/             CodeMirror extension
+    └── styles/             Themes and layout
 
-src-tauri/                  Application native Rust et configuration Tauri
+src-tauri/                  Native Rust application and Tauri configuration
 ```
 
-Cette organisation s’inspire de la Clean Architecture : le domaine ne dépend
-pas de React ou de Tauri, tandis que les détails du système sont isolés dans
-l’infrastructure.
+This structure follows Clean Architecture principles: the domain does not
+depend on React or Tauri, while system-specific details remain isolated in the
+infrastructure layer.
 
-## Technologies
+## Technology
 
-- React 19 et TypeScript ;
-- CodeMirror 6 et Lezer Markdown ;
-- Tailwind CSS 4 ;
-- KaTeX et MathJax 4 ;
-- Tauri 2 et Rust ;
-- WebKitGTK sous Linux ;
-- Vitest et Testing Library.
+- React 19 and TypeScript;
+- CodeMirror 6 and Lezer Markdown;
+- Tailwind CSS 4;
+- KaTeX and MathJax 4;
+- Tauri 2 and Rust;
+- WebKitGTK on Linux;
+- Vitest and Testing Library.
 
 ## Documentation
 
-Le manuel d’utilisation est disponible dans
+The user guide is available in French in
 [`DOCUMENTATION.md`](DOCUMENTATION.md).
 
-## Contribuer
+## Contributing
 
-Les rapports de bugs et propositions d’amélioration peuvent être ouverts dans
-les issues du dépôt. Pour proposer une modification :
+Bug reports and feature suggestions are welcome in the repository issues. To
+propose a code change:
 
-1. créez une branche dédiée ;
-2. ajoutez ou adaptez les tests concernés ;
-3. exécutez les vérifications du projet ;
-4. ouvrez une pull request avec une description concise du changement.
+1. create a dedicated branch;
+2. add or update the relevant tests;
+3. run the project checks;
+4. open a pull request with a concise description of the change.
 
-## Licence
+## License
 
-Repsel est distribué sous licence MIT. Consultez le fichier
-[`LICENSE`](LICENSE) pour les conditions complètes.
+Repsel is distributed under the MIT License. See [`LICENSE`](LICENSE) for the
+full terms.

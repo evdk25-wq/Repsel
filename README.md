@@ -15,6 +15,8 @@
 
 Repsel is available for 64-bit Linux systems.
 
+**Apple Silicon support coming soon.**
+
 | Format | Recommended for | Download |
 | --- | --- | --- |
 | Debian `.deb` | Debian, Ubuntu, and derivatives | [Repsel 1.1.0 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.1.0/Repsel_1.1.0_amd64.deb) |

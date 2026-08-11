@@ -15,6 +15,8 @@
 
 Repsel est disponible pour Linux sur les machines 64 bits.
 
+**Prise en charge des Mac Apple Silicon prochainement.**
+
 | Format | Usage | Téléchargement |
 | --- | --- | --- |
 | Debian `.deb` | Debian, Ubuntu et distributions dérivées | [Repsel 1.1.0 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.1.0/Repsel_1.1.0_amd64.deb) |

@@ -10,6 +10,13 @@ describe("document domain", () => {
     expect(countDocument("Repsel écrit bien")).toEqual({ words: 3, characters: 17 });
   });
 
+  it("excludes embedded image data from document statistics", () => {
+    expect(countDocument("Photo ![Vue](data:image/png;base64,aGVsbG8=)")).toEqual({
+      words: 2,
+      characters: 14,
+    });
+  });
+
   it("extracts cross-platform filenames", () => {
     expect(filenameFromPath("/tmp/note.md")).toBe("note.md");
     expect(filenameFromPath("C:\\Notes\\note.md")).toBe("note.md");

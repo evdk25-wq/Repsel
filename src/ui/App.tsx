@@ -191,7 +191,7 @@ const App: React.FC = () => {
       <main className="editor-stage">
         <Editor key={editorSession} initialContent={content} onChange={handleContentChange} />
       </main>
-      <StatusBar wordCount={wordCount} charCount={charCount} isDirty={isDirty} />
+      <StatusBar wordCount={wordCount} charCount={charCount} />
 
       {isCloseDialogOpen && (
         <div className="confirm-overlay" role="presentation">

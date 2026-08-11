@@ -13,7 +13,8 @@ pub fn run() {
             commands::file_commands::select_pdf_destination,
             commands::file_commands::save_document,
             commands::file_commands::load_document,
-            commands::file_commands::save_binary_file
+            commands::file_commands::save_binary_file,
+            commands::font_commands::list_system_fonts
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

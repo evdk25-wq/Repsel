@@ -11,14 +11,14 @@
   application powered by Tauri and WebKitGTK.
 </div>
 
-## Download Repsel 1.0.1
+## Download Repsel 1.1.0 — Red Baron
 
 Repsel is available for 64-bit Linux systems.
 
 | Format | Recommended for | Download |
 | --- | --- | --- |
-| Debian `.deb` | Debian, Ubuntu, and derivatives | [Repsel 1.0.1 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.0.1/Repsel_1.0.1_amd64.deb) |
-| AppImage | Portable use without installation | [Repsel 1.0.1 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.0.1/Repsel_1.0.1_amd64.AppImage) |
+| Debian `.deb` | Debian, Ubuntu, and derivatives | [Repsel 1.1.0 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.1.0/Repsel_1.1.0_amd64.deb) |
+| AppImage | Portable use without installation | [Repsel 1.1.0 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.1.0/Repsel_1.1.0_amd64.AppImage) |
 
 All versions and release notes are available from
 [GitHub Releases](https://github.com/evdk25-wq/Repsel/releases).
@@ -26,14 +26,14 @@ All versions and release notes are available from
 ### Install the Debian package
 
 ```bash
-sudo apt install ./Repsel_1.0.1_amd64.deb
+sudo apt install ./Repsel_1.1.0_amd64.deb
 ```
 
 ### Run the AppImage
 
 ```bash
-chmod +x Repsel_1.0.1_amd64.AppImage
-./Repsel_1.0.1_amd64.AppImage
+chmod +x Repsel_1.1.0_amd64.AppImage
+./Repsel_1.1.0_amd64.AppImage
 ```
 
 ## About
@@ -49,11 +49,14 @@ online service to open, edit, or save a document.
 
 - Markdown editing powered by CodeMirror 6;
 - visual syntax hiding outside the active line;
+- synchronized source and rendered preview modes;
 - headings, lists, blockquotes, tasks, tables, links, and code blocks;
 - inline and display mathematical notation;
 - insertion palette and quick commands;
 - contextual formatting toolbar;
 - open, save, and Save As commands;
+- embedded local images stored inside the Markdown document;
+- configurable document typography;
 - protection against unsaved changes;
 - A4 PDF export with pagination and WebKitGTK-compatible mathematical rendering;
 - persistent light and dark themes;

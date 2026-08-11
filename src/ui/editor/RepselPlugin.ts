@@ -1,5 +1,6 @@
 import { ViewPlugin, Decoration, DecorationSet, EditorView, WidgetType, ViewUpdate } from "@codemirror/view";
 import { syntaxTree } from "@codemirror/language";
+import type { Range } from "@codemirror/state";
 import katex from "katex";
 
 class MathWidget extends WidgetType {
@@ -19,7 +20,7 @@ class MathWidget extends WidgetType {
         displayMode: this.block,
         throwOnError: false,
       });
-    } catch (e) {
+    } catch {
       el.textContent = this.math;
       el.className += " text-red-500";
     }
@@ -31,11 +32,28 @@ class MathWidget extends WidgetType {
   }
 }
 
+class EmbeddedImageWidget extends WidgetType {
+  constructor(readonly format: string, readonly size: number) {
+    super();
+  }
+
+  eq(other: EmbeddedImageWidget) {
+    return this.format === other.format && this.size === other.size;
+  }
+
+  toDOM() {
+    const element = document.createElement("span");
+    element.className = "cm-embedded-image-data";
+    element.textContent = `Image · ${this.format.toUpperCase()} · ${Math.max(1, Math.round(this.size / 1024))} Ko`;
+    return element;
+  }
+}
+
 const hiddenMark = Decoration.replace({});
 const inlineHiddenTextMark = Decoration.mark({ class: "opacity-0 text-[1px] leading-[1px] text-transparent select-none inline-block w-0" });
 
 const buildUnifiedDecorations = (view: EditorView) => {
-  const widgets: any[] = [];
+  const widgets: Range<Decoration>[] = [];
   const decoratedLines = new Set<number>();
   const text = view.state.doc.toString();
   const selection = view.state.selection.main;
@@ -43,17 +61,30 @@ const buildUnifiedDecorations = (view: EditorView) => {
 
   const replacedRanges: { from: number; to: number }[] = [];
 
+  const embeddedImageRegex = /data:image\/(png|jpeg|gif|webp);base64,[A-Za-z0-9+/=]+/gu;
+  let embeddedImageMatch: RegExpExecArray | null;
+  while ((embeddedImageMatch = embeddedImageRegex.exec(text)) !== null) {
+    const encodedData = embeddedImageMatch[0].slice(embeddedImageMatch[0].indexOf(",") + 1);
+    const estimatedSize = Math.floor((encodedData.length * 3) / 4);
+    const from = embeddedImageMatch.index;
+    const to = from + embeddedImageMatch[0].length;
+    widgets.push(Decoration.replace({
+      widget: new EmbeddedImageWidget(embeddedImageMatch[1], estimatedSize),
+    }).range(from, to));
+    replacedRanges.push({ from, to });
+  }
+
   const addMath = (from: number, to: number, mathContent: string, isBlock: boolean) => {
     const isCursorInside = selection.head >= from && selection.head <= to;
     if (!isCursorInside) {
       if (isBlock) {
-        widgets.push(Decoration.widget({ 
-          widget: new MathWidget(mathContent, true)
+        widgets.push(Decoration.widget({
+          widget: new MathWidget(mathContent, true),
         }).range(from));
-        
+
         let currentLine = view.state.doc.lineAt(from);
         const endLine = view.state.doc.lineAt(to);
-        
+
         while (currentLine.number <= endLine.number) {
           const start = Math.max(from, currentLine.from);
           const end = Math.min(to, currentLine.to);
@@ -63,11 +94,11 @@ const buildUnifiedDecorations = (view: EditorView) => {
           if (currentLine.number === endLine.number) break;
           currentLine = view.state.doc.line(currentLine.number + 1);
         }
-        
+
         replacedRanges.push({ from, to });
       } else {
-        widgets.push(Decoration.replace({ 
-          widget: new MathWidget(mathContent, false)
+        widgets.push(Decoration.replace({
+          widget: new MathWidget(mathContent, false),
         }).range(from, to));
         replacedRanges.push({ from, to });
       }
@@ -114,7 +145,7 @@ const buildUnifiedDecorations = (view: EditorView) => {
         if (name === "Emphasis") widgets.push(Decoration.mark({ class: "repsel-emphasis" }).range(node.from, node.to));
         if (name === "InlineCode") widgets.push(Decoration.mark({ class: "repsel-inline-code" }).range(node.from, node.to));
         if (name === "Link") widgets.push(Decoration.mark({ class: "repsel-link" }).range(node.from, node.to));
-        
+
         if (!isActive) {
           if (
             name === "HeaderMark" ||

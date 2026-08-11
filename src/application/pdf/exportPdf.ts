@@ -1,4 +1,4 @@
-import { marked } from "marked";
+import { renderMarkdownHtml } from "../markdown/renderHtml";
 
 interface HtmlToPdfWorker {
   set(options: object): HtmlToPdfWorker;
@@ -10,52 +10,37 @@ interface HtmlToPdfWorker {
 
 type HtmlToPdfFactory = () => HtmlToPdfWorker;
 
-const renderMath = async (
-  markdown: string,
-): Promise<{ source: string; fragments: Map<string, string> }> => {
-  const { renderMathSvg } = await import("./mathSvg");
-  const fragments = new Map<string, string>();
-  let index = 0;
-  const replace = (expression: string, displayMode: boolean) => {
-    const token = `REPSELMATH${index++}TOKEN`;
-    fragments.set(token, renderMathSvg(expression, displayMode));
-    return token;
-  };
-
-  const blocks = markdown.replace(/\$\$([\s\S]+?)\$\$/gu, (_, expression: string) => replace(expression, true));
-  const source = blocks.replace(/\$([^$\n]+?)\$/gu, (_, expression: string) => replace(expression, false));
-  return { source, fragments };
-};
-
-const sanitize = (html: string): string => {
-  const documentNode = new DOMParser().parseFromString(html, "text/html");
-  documentNode.querySelectorAll("script, iframe, object, embed").forEach((node) => node.remove());
-  documentNode.querySelectorAll("*").forEach((node) => {
-    for (const attribute of Array.from(node.attributes)) {
-      if (attribute.name.startsWith("on")) node.removeAttribute(attribute.name);
-      if ((attribute.name === "href" || attribute.name === "src") && /^\s*javascript:/iu.test(attribute.value)) {
-        node.removeAttribute(attribute.name);
-      }
+export const markPageBreakRelationships = (root: HTMLElement): void => {
+  root.querySelectorAll("p").forEach((paragraph) => {
+    const next = paragraph.nextElementSibling;
+    if (next?.matches("ul, ol, table, pre, blockquote, .repsel-math-display")) {
+      const group = document.createElement("div");
+      group.className = "pdf-keep-together";
+      paragraph.parentElement?.insertBefore(group, paragraph);
+      group.append(paragraph, next);
     }
   });
-  return documentNode.body.innerHTML;
+
+  root.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((heading) => {
+    const next = heading.nextElementSibling;
+    if (!next) return;
+    const group = document.createElement("div");
+    group.className = "pdf-keep-together";
+    heading.parentElement?.insertBefore(group, heading);
+    group.append(heading, next);
+  });
 };
 
 const buildExportElement = async (content: string, title: string): Promise<HTMLElement> => {
-  const { source, fragments } = await renderMath(content);
-  let html = marked.parse(source, { gfm: true, breaks: false }) as string;
-  fragments.forEach((fragment, token) => {
-    html = html.split(token).join(fragment);
-  });
-
   const root = document.createElement("article");
   root.className = "repsel-pdf";
   root.id = "repsel-pdf-export";
-  root.innerHTML = sanitize(html);
+  root.innerHTML = await renderMarkdownHtml(content);
   root.dataset.title = title;
   root.querySelectorAll('li > input[type="checkbox"]').forEach((checkbox) => {
     checkbox.parentElement?.classList.add("task-list-item");
   });
+  markPageBreakRelationships(root);
   const stage = document.createElement("div");
   stage.className = "repsel-export-stage";
   stage.appendChild(root);
@@ -107,7 +92,7 @@ export const createPdf = async (content: string, title: string): Promise<Uint8Ar
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
         pagebreak: {
           mode: ["avoid-all", "css", "legacy"],
-          avoid: ["p", "li", "pre", "blockquote", "table", "tr", ".repsel-math-display"],
+          avoid: ["p", "li", "pre", "blockquote", "table", "tr", ".repsel-math-display", ".pdf-keep-together"],
         },
       })
       .from(element)

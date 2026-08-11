@@ -1,23 +1,57 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { EditorSelection, EditorState } from "@codemirror/state";
 import { EditorView, keymap } from "@codemirror/view";
-import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+import { defaultKeymap, history, historyKeymap, redo, undo } from "@codemirror/commands";
+import { defaultHighlightStyle, syntaxHighlighting } from "@codemirror/language";
+import { findNext, findPrevious, openSearchPanel, search, searchKeymap } from "@codemirror/search";
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
-import { repselPlugin } from "../editor/RepselPlugin";
 import repselLogo from "../../assets/RepselLogoUI.png";
+import { renderMarkdownHtml } from "../../application/markdown/renderHtml";
 import { buildOutline, type InsertCommand, type OutlineItem } from "../../domain/markdown";
 import { useI18n } from "../i18n";
+import type { EditorCommand } from "../editor/editorCommands";
+import MarkdownPreview from "./MarkdownPreview";
 
 interface EditorProps {
   initialContent: string;
   onChange: (content: string) => void;
 }
 
+interface SelectedImage {
+  name: string;
+  source: string;
+}
+
+const selectImage = (): Promise<SelectedImage | null> =>
+  new Promise((resolve) => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/png,image/jpeg,image/gif,image/webp";
+    input.addEventListener("change", () => {
+      const file = input.files?.[0];
+      if (!file) {
+        resolve(null);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.addEventListener("load", () => {
+        resolve(typeof reader.result === "string" ? { name: file.name, source: reader.result } : null);
+      });
+      reader.addEventListener("error", () => resolve(null));
+      reader.readAsDataURL(file);
+    });
+    input.click();
+  });
+
 const Editor: React.FC<EditorProps> = ({ initialContent, onChange }) => {
   const { locale, t } = useI18n();
   const editorRef = useRef<HTMLDivElement>(null);
+  const paperRef = useRef<HTMLDivElement>(null);
+  const previewPaneRef = useRef<HTMLElement>(null);
   const viewRef = useRef<EditorView | null>(null);
+  const scrollOwnerRef = useRef<"source" | "preview">("source");
   const applyingExternalContentRef = useRef(false);
   const commandsRef = useRef<InsertCommand[]>([]);
   const linkPlaceholderRef = useRef("libellé");
@@ -30,6 +64,11 @@ const Editor: React.FC<EditorProps> = ({ initialContent, onChange }) => {
   );
   const [slashMenu, setSlashMenu] = useState<{ from: number; to: number; query: string; left: number; top: number } | null>(null);
   const [selectionMenu, setSelectionMenu] = useState<{ left: number; top: number } | null>(null);
+  const [viewMode, setViewMode] = useState<"source" | "split" | "preview">("split");
+  const [splitPercent, setSplitPercent] = useState(() => {
+    const saved = Number(localStorage.getItem("repsel-split-percent"));
+    return Number.isFinite(saved) && saved >= 30 && saved <= 70 ? saved : 50;
+  });
   const localizedCommands = useMemo<InsertCommand[]>(() => [
     { id: "titre", label: t("commandTitle"), hint: "#", template: `# ${t("placeholderTitle")}`, selectionStart: 2, selectionLength: t("placeholderTitle").length },
     { id: "section", label: t("commandSection"), hint: "##", template: `## ${t("placeholderSection")}`, selectionStart: 3, selectionLength: t("placeholderSection").length },
@@ -153,6 +192,7 @@ const Editor: React.FC<EditorProps> = ({ initialContent, onChange }) => {
     { key: "Mod-k", run: () => { wrapSelection("[", "](https://)", linkPlaceholderRef.current); return true; } },
     { key: "Mod-p", run: () => { setRailMode("blocks"); return true; } },
     { key: "Mod-/", run: () => { setRailMode("blocks"); return true; } },
+    { key: "Mod-r", run: (view: EditorView) => openSearchPanel(view) },
   ];
 
   useEffect(() => {
@@ -162,9 +202,10 @@ const Editor: React.FC<EditorProps> = ({ initialContent, onChange }) => {
       doc: initialContent,
       extensions: [
         history(),
-        keymap.of([...editorKeymap, ...defaultKeymap, ...historyKeymap]),
+        search({ top: true }),
+        keymap.of([...editorKeymap, ...searchKeymap, ...defaultKeymap, ...historyKeymap]),
         markdown({ base: markdownLanguage, codeLanguages: languages }),
-        repselPlugin,
+        syntaxHighlighting(defaultHighlightStyle),
         EditorView.lineWrapping,
         EditorView.domEventHandlers({
           keydown: (event, view) => {
@@ -210,9 +251,9 @@ const Editor: React.FC<EditorProps> = ({ initialContent, onChange }) => {
           if (update.docChanged || update.selectionSet || update.viewportChanged) updateContextualUi(update.view);
         }),
         EditorView.theme({
-          "&": { height: "100%", fontSize: "17px", backgroundColor: "transparent" },
-          ".cm-scroller": { overflow: "auto", lineHeight: "1.72" },
-          ".cm-content": { fontFamily: "var(--font-editor)", padding: "52px 72px 120px", maxWidth: "840px", margin: "0 auto", caretColor: "var(--accent)" },
+          "&": { height: "100%", fontSize: "15px", backgroundColor: "transparent" },
+          ".cm-scroller": { overflow: "auto", lineHeight: "1.55" },
+          ".cm-content": { fontFamily: "var(--font-code)", padding: "36px 32px 100px", caretColor: "var(--accent)" },
           ".cm-line": { padding: "1px 0" },
           ".cm-selectionBackground": { backgroundColor: "var(--selection) !important" },
           ".cm-cursor": { borderLeftColor: "var(--accent)", borderLeftWidth: "2px" },
@@ -227,8 +268,55 @@ const Editor: React.FC<EditorProps> = ({ initialContent, onChange }) => {
     });
 
     viewRef.current = view;
+    view.contentDOM.spellcheck = localStorage.getItem("repsel-spellcheck") !== "false";
+
+    const handleEditorCommand = (event: Event) => {
+      const command = (event as CustomEvent<EditorCommand>).detail;
+      const selection = view.state.selection.main;
+      const selectedText = view.state.sliceDoc(selection.from, selection.to);
+
+      if (command === "undo") undo(view);
+      if (command === "redo") redo(view);
+      if (command === "selectAll") view.dispatch({ selection: EditorSelection.single(0, view.state.doc.length) });
+      if (command === "deselect") view.dispatch({ selection: EditorSelection.cursor(selection.head) });
+      if (command === "find" || command === "replace") openSearchPanel(view);
+      if (command === "findNext") findNext(view);
+      if (command === "findPrevious") findPrevious(view);
+      if (command === "toggleSpellcheck") view.contentDOM.spellcheck = !view.contentDOM.spellcheck;
+
+      if (command === "copy" && selectedText) void navigator.clipboard.writeText(selectedText).catch(() => undefined);
+      if (command === "cut" && selectedText) {
+        void navigator.clipboard.writeText(selectedText).then(() => {
+          view.dispatch({ changes: { from: selection.from, to: selection.to }, selection: { anchor: selection.from } });
+        }).catch(() => undefined);
+      }
+      if (command === "paste") {
+        void navigator.clipboard.readText().then((text) => {
+          view.dispatch({ changes: { from: selection.from, to: selection.to, insert: text }, selection: { anchor: selection.from + text.length } });
+        }).catch(() => undefined);
+      }
+      if (command === "copyHtml") {
+        const markdownContent = selectedText || view.state.doc.toString();
+        void renderMarkdownHtml(markdownContent).then((html) => navigator.clipboard.writeText(html)).catch(() => undefined);
+      }
+      if (command === "insertImage") {
+        void selectImage().then((image) => {
+          if (!image) return;
+          const label = (selectedText || image.name.replace(/\.[^.]+$/u, "")).replace(/[\[\]]/gu, "");
+          const insert = `![${label}](${image.source})`;
+          view.dispatch({
+            changes: { from: selection.from, to: selection.to, insert },
+            selection: { anchor: selection.from + insert.length },
+          });
+          view.focus();
+        });
+      }
+      view.focus();
+    };
+    window.addEventListener("repsel-editor-command", handleEditorCommand);
 
     return () => {
+      window.removeEventListener("repsel-editor-command", handleEditorCommand);
       view.destroy();
     };
   }, []);
@@ -249,6 +337,69 @@ const Editor: React.FC<EditorProps> = ({ initialContent, onChange }) => {
       }
     }
   }, [initialContent]);
+
+  useEffect(() => {
+    if (isEmpty || viewMode !== "split") return;
+    const source = viewRef.current?.scrollDOM;
+    const preview = previewPaneRef.current;
+    if (!source || !preview) return;
+
+    const sync = (from: HTMLElement, to: HTMLElement) => {
+      const available = from.scrollHeight - from.clientHeight;
+      if (available <= 0) return;
+      const targetAvailable = Math.max(0, to.scrollHeight - to.clientHeight);
+      to.scrollTop = (from.scrollTop / available) * targetAvailable;
+    };
+    const ownSource = () => { scrollOwnerRef.current = "source"; };
+    const ownPreview = () => { scrollOwnerRef.current = "preview"; };
+    const syncPreview = () => {
+      if (scrollOwnerRef.current === "source") sync(source, preview);
+    };
+    const syncSource = () => {
+      if (scrollOwnerRef.current === "preview") sync(preview, source);
+    };
+    source.addEventListener("wheel", ownSource, { passive: true });
+    source.addEventListener("pointerdown", ownSource, { passive: true });
+    source.addEventListener("touchstart", ownSource, { passive: true });
+    preview.addEventListener("wheel", ownPreview, { passive: true });
+    preview.addEventListener("pointerdown", ownPreview, { passive: true });
+    preview.addEventListener("touchstart", ownPreview, { passive: true });
+    source.addEventListener("scroll", syncPreview, { passive: true });
+    preview.addEventListener("scroll", syncSource, { passive: true });
+    return () => {
+      source.removeEventListener("wheel", ownSource);
+      source.removeEventListener("pointerdown", ownSource);
+      source.removeEventListener("touchstart", ownSource);
+      preview.removeEventListener("wheel", ownPreview);
+      preview.removeEventListener("pointerdown", ownPreview);
+      preview.removeEventListener("touchstart", ownPreview);
+      source.removeEventListener("scroll", syncPreview);
+      preview.removeEventListener("scroll", syncSource);
+    };
+  }, [isEmpty, viewMode]);
+
+  const beginResize = (event: React.PointerEvent) => {
+    const paper = paperRef.current;
+    if (!paper) return;
+    event.preventDefault();
+    const update = (pointerEvent: PointerEvent) => {
+      const bounds = paper.getBoundingClientRect();
+      const percent = window.innerWidth <= 720
+        ? ((pointerEvent.clientY - bounds.top) / bounds.height) * 100
+        : ((pointerEvent.clientX - bounds.left) / bounds.width) * 100;
+      setSplitPercent(Math.min(70, Math.max(30, percent)));
+    };
+    const finish = () => {
+      window.removeEventListener("pointermove", update);
+      window.removeEventListener("pointerup", finish);
+      setSplitPercent((current) => {
+        localStorage.setItem("repsel-split-percent", String(current));
+        return current;
+      });
+    };
+    window.addEventListener("pointermove", update);
+    window.addEventListener("pointerup", finish);
+  };
 
   const keepEditorFocus = (event: React.MouseEvent) => event.preventDefault();
   const filteredCommands = localizedCommands.filter((command) =>
@@ -301,8 +452,41 @@ const Editor: React.FC<EditorProps> = ({ initialContent, onChange }) => {
         )}
       </aside>
 
-      <div className="paper-frame">
-        <div ref={editorRef} className="repsel-editor" />
+      <div
+        ref={paperRef}
+        className={`paper-frame ${isEmpty ? "is-empty" : `is-${viewMode}`}`}
+        style={!isEmpty && viewMode === "split" ? { gridTemplateColumns: `${splitPercent}% 6px minmax(0, 1fr)` } : undefined}
+      >
+        <section className={`markdown-source-pane ${!isEmpty && viewMode === "preview" ? "is-hidden" : ""}`} aria-label={t("markdownEditor")}>
+          <div ref={editorRef} className="repsel-editor" />
+          <aside className="format-toolbar" aria-label={t("quickFormatting")}>
+          <button onMouseDown={keepEditorFocus} onClick={() => prefixLine("# ")} className="format-tool" title={t("mainTitle")}>
+            <span className="format-heading">H1</span>
+          </button>
+          <div className="format-divider" />
+          <button onMouseDown={keepEditorFocus} onClick={() => wrapSelection("**")} className="format-tool format-bold" title={t("bold")}>
+            B
+          </button>
+          <button onMouseDown={keepEditorFocus} onClick={() => wrapSelection("*")} className="format-tool format-italic" title={t("italic")}>
+            I
+          </button>
+          <button onMouseDown={keepEditorFocus} onClick={() => wrapSelection("[", "](https://)", locale === "fr" ? "libellé" : "label")} className="format-tool" title={t("link")}>
+            <svg viewBox="0 0 20 20" aria-hidden="true">
+              <path d="m8.1 11.9 3.8-3.8M6.5 13.5l-1 1a2.83 2.83 0 0 1-4-4l2.25-2.25a2.83 2.83 0 0 1 4 0M13.5 6.5l1-1a2.83 2.83 0 1 1 4 4l-2.25 2.25a2.83 2.83 0 0 1-4 0" />
+            </svg>
+          </button>
+          <button onMouseDown={keepEditorFocus} onClick={() => wrapSelection("`")} className="format-tool" title={t("inlineCode")}>
+            <svg viewBox="0 0 20 20" aria-hidden="true">
+              <path d="m7.5 5-5 5 5 5M12.5 5l5 5-5 5" />
+            </svg>
+          </button>
+          <button onMouseDown={keepEditorFocus} onClick={() => wrapSelection("$", "$", "E=mc^2")} className="format-tool format-math" title={t("formula")}>
+            ∑
+          </button>
+          </aside>
+        </section>
+        {!isEmpty && viewMode === "split" && <div className="split-resizer" onPointerDown={beginResize} role="separator" aria-orientation="vertical" />}
+        {!isEmpty && viewMode !== "source" && <MarkdownPreview content={initialContent} paneRef={previewPaneRef} />}
         {isEmpty && !isWelcomeDismissed && (
           <section className="editor-welcome" onClick={() => { setIsWelcomeDismissed(true); viewRef.current?.focus(); }}>
             <div className="welcome-mark">
@@ -310,40 +494,20 @@ const Editor: React.FC<EditorProps> = ({ initialContent, onChange }) => {
             </div>
             <p className="welcome-eyebrow">{t("markdownEditor")}</p>
             <h1>{t("welcome")}</h1>
-            <p className="welcome-copy">{t("welcomeCopy")}</p>
             <div className="welcome-shortcuts">
               <div><kbd>Ctrl O</kbd><span>{t("openDocument")}</span></div>
               <div><kbd>Ctrl S</kbd><span>{t("save")}</span></div>
               <div><kbd>/</kbd><span>{t("insertBlock")}</span></div>
             </div>
-            <button onClick={() => { setIsWelcomeDismissed(true); viewRef.current?.focus(); }}>{t("startWriting")}</button>
           </section>
         )}
-        <aside className="format-toolbar" aria-label={t("quickFormatting")}>
-        <button onMouseDown={keepEditorFocus} onClick={() => prefixLine("# ")} className="format-tool" title={t("mainTitle")}>
-          <span className="format-heading">H1</span>
-        </button>
-        <div className="format-divider" />
-        <button onMouseDown={keepEditorFocus} onClick={() => wrapSelection("**")} className="format-tool format-bold" title={t("bold")}>
-          B
-        </button>
-        <button onMouseDown={keepEditorFocus} onClick={() => wrapSelection("*")} className="format-tool format-italic" title={t("italic")}>
-          I
-        </button>
-        <button onMouseDown={keepEditorFocus} onClick={() => wrapSelection("[", "](https://)", locale === "fr" ? "libellé" : "label")} className="format-tool" title={t("link")}>
-          <svg viewBox="0 0 20 20" aria-hidden="true">
-            <path d="m8.1 11.9 3.8-3.8M6.5 13.5l-1 1a2.83 2.83 0 0 1-4-4l2.25-2.25a2.83 2.83 0 0 1 4 0M13.5 6.5l1-1a2.83 2.83 0 1 1 4 4l-2.25 2.25a2.83 2.83 0 0 1-4 0" />
-          </svg>
-        </button>
-        <button onMouseDown={keepEditorFocus} onClick={() => wrapSelection("`")} className="format-tool" title={t("inlineCode")}>
-          <svg viewBox="0 0 20 20" aria-hidden="true">
-            <path d="m7.5 5-5 5 5 5M12.5 5l5 5-5 5" />
-          </svg>
-        </button>
-        <button onMouseDown={keepEditorFocus} onClick={() => wrapSelection("$", "$", "E=mc^2")} className="format-tool format-math" title={t("formula")}>
-          ∑
-        </button>
-        </aside>
+        {!isEmpty && (
+          <div className="view-switcher" aria-label={t("viewMode") }>
+            <button className={viewMode === "source" ? "is-active" : ""} onClick={() => setViewMode("source")} title={t("sourceOnly")}><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M4 5h10M4 9h7M4 13h9" /></svg></button>
+            <button className={viewMode === "split" ? "is-active" : ""} onClick={() => setViewMode("split")} title={t("splitView")}><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 3v12M3 5h3M3 9h3M12 5h3M12 9h3" /></svg></button>
+            <button className={viewMode === "preview" ? "is-active" : ""} onClick={() => setViewMode("preview")} title={t("previewOnly")}><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M2.5 9s2.25-4 6.5-4 6.5 4 6.5 4-2.25 4-6.5 4S2.5 9 2.5 9Z" /><circle cx="9" cy="9" r="1.7" /></svg></button>
+          </div>
+        )}
       </div>
 
       {slashMenu && (

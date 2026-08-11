@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useI18n } from "../i18n";
+import { runEditorCommand } from "../editor/editorCommands";
+import TypographyDialog from "./TypographyDialog";
 
 interface MenuBarProps {
   onOpen: () => void;
@@ -12,6 +14,8 @@ interface MenuBarProps {
 const MenuBar: React.FC<MenuBarProps> = ({ onOpen, onSave, onSaveAs, onExport, onClear }) => {
   const { locale, setLocale, t } = useI18n();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [isTypographyOpen, setIsTypographyOpen] = useState(false);
+  const [spellcheckEnabled, setSpellcheckEnabled] = useState(() => localStorage.getItem("repsel-spellcheck") !== "false");
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -41,6 +45,7 @@ const MenuBar: React.FC<MenuBarProps> = ({ onOpen, onSave, onSaveAs, onExport, o
 
 
   return (
+    <>
     <nav ref={menuRef} className="menu-bar" aria-label={t("mainMenu")}>
       
       <div className="relative h-full flex items-center">
@@ -80,7 +85,35 @@ const MenuBar: React.FC<MenuBarProps> = ({ onOpen, onSave, onSaveAs, onExport, o
           {t("edit")}
         </button>
         {activeMenu === "edition" && (
-          <div className="menu-popover">
+          <div className="menu-popover menu-popover-wide">
+            <button onClick={() => handleAction(() => runEditorCommand("undo"))} className="menu-item"><span>{t("undo")}</span><span className="menu-shortcut">Ctrl+Z</span></button>
+            <button onClick={() => handleAction(() => runEditorCommand("redo"))} className="menu-item"><span>{t("redo")}</span><span className="menu-shortcut">Ctrl+Maj+Z</span></button>
+            <div className="menu-divider" />
+            <button onClick={() => handleAction(() => runEditorCommand("cut"))} className="menu-item"><span>{t("cut")}</span><span className="menu-shortcut">Ctrl+X</span></button>
+            <button onClick={() => handleAction(() => runEditorCommand("copy"))} className="menu-item"><span>{t("copy")}</span><span className="menu-shortcut">Ctrl+C</span></button>
+            <button onClick={() => handleAction(() => runEditorCommand("paste"))} className="menu-item"><span>{t("paste")}</span><span className="menu-shortcut">Ctrl+V</span></button>
+            <button onClick={() => handleAction(() => runEditorCommand("copyHtml"))} className="menu-item"><span>{t("copyHtml")}</span></button>
+            <div className="menu-divider" />
+            <button onClick={() => handleAction(() => runEditorCommand("selectAll"))} className="menu-item"><span>{t("selectAll")}</span><span className="menu-shortcut">Ctrl+A</span></button>
+            <button onClick={() => handleAction(() => runEditorCommand("deselect"))} className="menu-item"><span>{t("deselect")}</span><span className="menu-shortcut">Échap</span></button>
+            <div className="menu-divider" />
+            <button onClick={() => handleAction(() => runEditorCommand("insertImage"))} className="menu-item">{t("insertImage")}</button>
+            <div className="menu-divider" />
+            <button onClick={() => handleAction(() => runEditorCommand("find"))} className="menu-item"><span>{t("find")}</span><span className="menu-shortcut">Ctrl+F</span></button>
+            <button onClick={() => handleAction(() => runEditorCommand("replace"))} className="menu-item"><span>{t("replace")}</span><span className="menu-shortcut">Ctrl+R</span></button>
+            <button onClick={() => handleAction(() => runEditorCommand("findNext"))} className="menu-item"><span>{t("findNext")}</span><span className="menu-shortcut">F3</span></button>
+            <button onClick={() => handleAction(() => runEditorCommand("findPrevious"))} className="menu-item"><span>{t("findPrevious")}</span><span className="menu-shortcut">Maj+F3</span></button>
+            <div className="menu-divider" />
+            <button onClick={() => handleAction(() => {
+              setSpellcheckEnabled((enabled) => {
+                localStorage.setItem("repsel-spellcheck", String(!enabled));
+                return !enabled;
+              });
+              runEditorCommand("toggleSpellcheck");
+            })} className={`menu-item ${spellcheckEnabled ? "is-selected" : ""}`}>
+              <span>{t("spellcheck")}</span><span className="menu-check">{spellcheckEnabled ? "✓" : ""}</span>
+            </button>
+            <div className="menu-divider" />
             <button onClick={() => handleAction(onClear)} className="menu-item menu-item-danger">
               {t("newDocument")}
             </button>
@@ -101,6 +134,11 @@ const MenuBar: React.FC<MenuBarProps> = ({ onOpen, onSave, onSaveAs, onExport, o
               {t("toggleTheme")}
             </button>
             <div className="menu-divider" />
+            <button onClick={() => handleAction(() => setIsTypographyOpen(true))} className="menu-item">
+              <span className="menu-item-label">{t("typography")}</span>
+              <span className="menu-item-detail">Aa</span>
+            </button>
+            <div className="menu-divider" />
             <div className="menu-section-label">{t("language")}</div>
             <button onClick={() => handleAction(() => setLocale("fr"))} className={`menu-item ${locale === "fr" ? "is-selected" : ""}`}>
               <span>{t("french")}</span>
@@ -115,6 +153,8 @@ const MenuBar: React.FC<MenuBarProps> = ({ onOpen, onSave, onSaveAs, onExport, o
       </div>
 
     </nav>
+    {isTypographyOpen && <TypographyDialog onClose={() => setIsTypographyOpen(false)} />}
+    </>
   );
 };
 

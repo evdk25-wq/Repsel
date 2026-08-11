@@ -9,10 +9,16 @@ export interface RepselDocument {
   content: string;
 }
 
-export const countDocument = (content: string): DocumentStats => ({
-  characters: content.length,
-  words: content.trim() ? content.trim().split(/\s+/u).length : 0,
-});
+const withoutEmbeddedImageData = (content: string): string =>
+  content.replace(/data:image\/(?:png|jpeg|gif|webp);base64,[A-Za-z0-9+/=]+/gu, "");
+
+export const countDocument = (content: string): DocumentStats => {
+  const visibleContent = withoutEmbeddedImageData(content);
+  return {
+    characters: visibleContent.length,
+    words: visibleContent.trim() ? visibleContent.trim().split(/\s+/u).length : 0,
+  };
+};
 
 export const filenameFromPath = (path: string | null): string =>
   path?.split(/[\\/]/u).pop() || "Sans titre";

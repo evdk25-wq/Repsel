@@ -11,7 +11,7 @@
   application powered by Tauri and WebKitGTK.
 </div>
 
-## Download Repsel 1.1.0 — Red Baron
+## Download Repsel 1.1.0 - Red Baron
 
 Repsel is available for 64-bit Linux systems.
 

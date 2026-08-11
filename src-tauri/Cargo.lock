@@ -382,6 +382,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "core-text"
+version = "22.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "333dab512ce710ca2d08574c373d246dbeac8b22769e47da4c0e72730ce442b7"
+dependencies = [
+ "core-foundation",
+ "core-graphics",
+ "foreign-types",
+]
+
+[[package]]
 name = "cpufeatures"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2367,6 +2378,7 @@ checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 name = "repsel"
 version = "1.1.0"
 dependencies = [
+ "core-text",
  "serde",
  "serde_json",
  "tauri",

@@ -2,7 +2,7 @@
 
 All notable changes to Repsel are documented in this file.
 
-## 1.1.0 — Red Baron
+## 1.1.0: Red Baron
 
 - Added synchronized source and rendered preview modes.
 - Added configurable document typography and font discovery on Linux.

@@ -11,14 +11,14 @@
   locale fondée sur Tauri et WebKitGTK.
 </div>
 
-## Télécharger Repsel 1.0.1
+## Télécharger Repsel 1.1.0 : Red Baron
 
 Repsel est disponible pour Linux sur les machines 64 bits.
 
 | Format | Usage | Téléchargement |
 | --- | --- | --- |
-| Debian `.deb` | Debian, Ubuntu et distributions dérivées | [Repsel 1.0.1 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.0.1/Repsel_1.0.1_amd64.deb) |
-| AppImage | Exécution portable sans installation | [Repsel 1.0.1 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.0.1/Repsel_1.0.1_amd64.AppImage) |
+| Debian `.deb` | Debian, Ubuntu et distributions dérivées | [Repsel 1.1.0 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.1.0/Repsel_1.1.0_amd64.deb) |
+| AppImage | Exécution portable sans installation | [Repsel 1.1.0 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.1.0/Repsel_1.1.0_amd64.AppImage) |
 
 Toutes les versions et leurs notes sont disponibles dans les
 [releases GitHub](https://github.com/evdk25-wq/Repsel/releases).
@@ -26,14 +26,14 @@ Toutes les versions et leurs notes sont disponibles dans les
 ### Installer le paquet Debian
 
 ```bash
-sudo apt install ./Repsel_1.0.1_amd64.deb
+sudo apt install ./Repsel_1.1.0_amd64.deb
 ```
 
 ### Lancer l’AppImage
 
 ```bash
-chmod +x Repsel_1.0.1_amd64.AppImage
-./Repsel_1.0.1_amd64.AppImage
+chmod +x Repsel_1.1.0_amd64.AppImage
+./Repsel_1.1.0_amd64.AppImage
 ```
 
 ## À propos
@@ -50,11 +50,16 @@ enregistrer un document.
 
 - édition Markdown avec CodeMirror 6 ;
 - masquage visuel de la syntaxe hors de la ligne active ;
+- synchronisation entre le texte source et son aperçu ;
+- trois modes d’affichage : édition, vue partagée et aperçu ;
 - titres, listes, citations, tâches, tableaux, liens et blocs de code ;
 - formules mathématiques en ligne et centrées ;
 - palette d’insertion et commandes rapides ;
 - barre d’outils contextuelle ;
 - ouverture, enregistrement et « Enregistrer sous » ;
+- insertion d’images locales intégrées au document Markdown ;
+- choix de la police, de sa taille et de l’interligne ;
+- menu d’édition complet ;
 - protection des modifications non enregistrées ;
 - export PDF A4 avec pagination et rendu mathématique adapté à WebKitGTK ;
 - thèmes clair et sombre persistants ;

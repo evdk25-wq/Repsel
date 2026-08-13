@@ -79,15 +79,15 @@ export const createPdf = async (content: string, title: string): Promise<Uint8Ar
       .set({
         margin: [18, 18, 20, 18],
         filename: title.replace(/\.md$/iu, ".pdf"),
-        image: { type: "jpeg", quality: 0.98 },
+        image: { type: "jpeg", quality: 0.94 },
         html2canvas: {
-          scale: 2,
+          scale: 1.5,
           useCORS: true,
           backgroundColor: "#ffffff",
           scrollX: 0,
           scrollY: 0,
           windowWidth: 794,
-          windowHeight: Math.max(1123, element.scrollHeight),
+          windowHeight: 1123,
         },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
         pagebreak: {

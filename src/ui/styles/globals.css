@@ -1443,7 +1443,9 @@
 
 .repsel-pdf {
   position: relative;
-  width: 758px;
+  box-sizing: border-box;
+  width: 174mm;
+  max-width: 100%;
   min-height: 1px;
   margin: 0 auto;
   padding: 22px 28px;
@@ -1452,7 +1454,21 @@
   font-family: var(--font-document);
   font-size: var(--font-document-size);
   line-height: var(--font-document-line-height);
+  overflow-wrap: break-word;
   pointer-events: none;
+}
+
+.html2pdf__container > .repsel-pdf {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.repsel-pdf *,
+.repsel-pdf *::before,
+.repsel-pdf *::after {
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .repsel-pdf h1,

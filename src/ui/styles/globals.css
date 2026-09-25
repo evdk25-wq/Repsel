@@ -865,9 +865,9 @@
   left: 50%;
   z-index: 5;
   display: flex;
-  width: min(430px, calc(100% - 150px));
+  width: min(390px, calc(100% - 150px));
   align-items: center;
-  transform: translate(-50%, -54%);
+  transform: translate(-50%, -50%);
   flex-direction: column;
   color: var(--text);
   text-align: center;
@@ -876,9 +876,9 @@
 }
 
 .welcome-mark {
-  width: 42px;
-  height: 42px;
-  margin-bottom: 19px;
+  width: 36px;
+  height: 36px;
+  margin-bottom: 15px;
   overflow: hidden;
   border-radius: 12px;
   box-shadow: 0 7px 20px rgba(67, 87, 181, 0.26);
@@ -896,28 +896,29 @@
 .editor-welcome h1 {
   margin: 0;
   font-family: var(--font-ui);
-  font-size: clamp(25px, 2.3vw, 34px);
+  font-size: clamp(23px, 2.1vw, 30px);
   font-weight: 680;
   letter-spacing: -0.035em;
 }
 
 .welcome-shortcuts {
-  display: grid;
-  width: 100%;
-  margin-top: 24px;
-  padding: 13px 15px;
-  gap: 10px;
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  background: color-mix(in srgb, var(--surface) 60%, transparent);
+  display: flex;
+  width: auto;
+  margin-top: 19px;
+  padding: 0;
+  gap: 22px;
+  border: 0;
+  background: transparent;
 }
 
 .welcome-shortcuts > div {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: initial;
+  gap: 6px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 10px;
+  flex-direction: column;
 }
 
 .welcome-shortcuts kbd {

@@ -2,7 +2,7 @@
   "name": "repsel",
   "private": true,
   "version": "1.1.1",
-  "description": "A focused Markdown editor for Linux",
+  "description": "A focused Markdown editor for Linux and Apple Silicon Macs",
   "license": "MIT",
   "type": "module",
   "scripts": {

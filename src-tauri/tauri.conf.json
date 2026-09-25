@@ -45,8 +45,8 @@
     "copyright": "Copyright © 2026 Repsel contributors",
     "license": "MIT",
     "licenseFile": "../LICENSE",
-    "shortDescription": "A focused Markdown editor for Linux",
-    "longDescription": "Repsel is a local-first Markdown editor for Linux with live formatting, mathematical notation and polished PDF export.",
+    "shortDescription": "A focused Markdown editor for Linux and Apple Silicon Macs",
+    "longDescription": "Repsel is a local-first Markdown editor for Linux and Apple Silicon Macs with live formatting, mathematical notation and polished PDF export.",
     "linux": {
       "deb": {
         "section": "editors",

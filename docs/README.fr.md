@@ -5,10 +5,10 @@
 
   [English](../README.md) · **Français**
 
-  **Un éditeur Markdown de bureau, sobre et concentré, conçu pour Linux.**
+  **Un éditeur Markdown de bureau, sobre et concentré, pour Linux et les Mac Apple Silicon.**
 
   Écriture fluide, formules mathématiques et export PDF dans une application
-  locale fondée sur Tauri et WebKitGTK.
+  locale fondée sur Tauri et le webview natif du système.
 </div>
 
 ## Télécharger Repsel 1.1.0 : Red Baron

@@ -1,5 +1,5 @@
 <div align="center">
-  <p><img src="../1.png" alt="Aperçu de l'application" style="max-width:100%;height:auto"></p>
+  <p><img src="../2.png" alt="Aperçu de l'application" style="max-width:100%;height:auto"></p>
 
   # Repsel
 

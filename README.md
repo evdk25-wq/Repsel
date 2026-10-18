@@ -11,7 +11,7 @@
   application powered by Tauri and the native system webview.
 </div>
 
-## Download Repsel 1.1.4
+## Download Repsel 1.1.5
 
 Repsel is available for 64-bit Linux systems.
 
@@ -19,8 +19,8 @@ Repsel is available for 64-bit Linux systems.
 
 | Format | Recommended for | Download |
 | --- | --- | --- |
-| Debian `.deb` | Debian, Ubuntu, and derivatives | [Repsel 1.1.4 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.1.4/Repsel_1.1.4_amd64.deb) |
-| AppImage | Portable use without installation | [Repsel 1.1.4 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.1.4/Repsel_1.1.4_amd64.AppImage) |
+| Debian `.deb` | Debian, Ubuntu, and derivatives | [Repsel 1.1.5 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.1.5/Repsel_1.1.5_amd64.deb) |
+| AppImage | Portable use without installation | [Repsel 1.1.5 AMD64](https://github.com/evdk25-wq/Repsel/releases/download/v1.1.5/Repsel_1.1.5_amd64.AppImage) |
 
 All versions and release notes are available from
 [GitHub Releases](https://github.com/evdk25-wq/Repsel/releases).
@@ -28,14 +28,14 @@ All versions and release notes are available from
 ### Install the Debian package
 
 ```bash
-sudo apt install ./Repsel_1.1.4_amd64.deb
+sudo apt install ./Repsel_1.1.5_amd64.deb
 ```
 
 ### Run the AppImage
 
 ```bash
-chmod +x Repsel_1.1.4_amd64.AppImage
-./Repsel_1.1.4_amd64.AppImage
+chmod +x Repsel_1.1.5_amd64.AppImage
+./Repsel_1.1.5_amd64.AppImage
 ```
 
 ## About
